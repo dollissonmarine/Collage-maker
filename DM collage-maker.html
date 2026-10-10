@@ -895,7 +895,14 @@
     ctx = origCtx;
 
     var a = document.createElement('a');
-    a.download = 'dollisson-collage.' + (state.format === 'jpg' ? 'jpg' : 'png');
+    var ts = new Date();
+    var stamp = ts.getFullYear().toString() +
+      String(ts.getMonth()+1).padStart(2,'0') +
+      String(ts.getDate()).padStart(2,'0') + '-' +
+      String(ts.getHours()).padStart(2,'0') +
+      String(ts.getMinutes()).padStart(2,'0') +
+      String(ts.getSeconds()).padStart(2,'0');
+    a.download = 'collage-' + stamp + '.' + (state.format === 'jpg' ? 'jpg' : 'png');
     if (state.format === 'jpg') {
       a.href = offscreen.toDataURL('image/jpeg', state.jpgQuality);
     } else {
