@@ -94,7 +94,7 @@
   @media(max-width:720px){
     .layout-grid{grid-template-columns:1fr;display:flex;flex-direction:column-reverse;}
     .left-col{order:2;}
-    .right-col{order:1;position:sticky;top:0;z-index:50;}
+    .right-col{order:1;position:sticky;top:0;z-index:50;padding-bottom:80px;}
     .canvas-wrap{padding:10px;}
     .layout-options{grid-template-columns:1fr 1fr 1fr;}
     .slot-actions button{width:28px;height:28px;font-size:13px;}
@@ -423,12 +423,29 @@
     var p = state.photos.find(function(p){ return p && p.w; });
     if (!p) return { w:1600, h:1067 };
     var aspect = p.w / p.h;
-    if (state.layout && (state.layout.id === 'top-bottom' || state.layout.id === '3-equal-rows' || state.layout.id === '4-big-top' || state.layout.id === '4-big-bottom' || state.layout.id === '3-big-top' || state.layout.id === '3-big-bottom')) {
-      aspect = 1.2;
+    var lid = state.layout ? state.layout.id : '';
+    // Stacked vertical layouts: canvas height = photo-width * number of stacked rows
+    // For two landscape photos stacked top/bottom: aspect = photoAspect / 2
+    if (lid === 'top-bottom') {
+      aspect = aspect / 2;
+    } else if (lid === '3-equal-rows') {
+      aspect = aspect / 3;
+    } else if (lid === '3-big-top' || lid === '3-big-bottom') {
+      // one big + two small stacked: roughly 2/3 of full stack height
+      aspect = aspect / 2;
+    } else if (lid === '4-big-top' || lid === '4-big-bottom') {
+      // big row + row of 3: use ~1/2 stacked height
+      aspect = aspect / 2;
+    }
+    // Side-by-side layouts: canvas width = photo-height * number of side cols
+    if (lid === 'side-by-side') {
+      aspect = aspect * 2;
+    } else if (lid === '3-equal-cols') {
+      aspect = aspect * 3;
     }
     var W = 1600, H = Math.round(W / aspect);
     if (H < 800) H = 800;
-    if (H > 2400) H = 2400;
+    if (H > 4800) H = 4800;
     return { w:W, h:H };
   }
 
