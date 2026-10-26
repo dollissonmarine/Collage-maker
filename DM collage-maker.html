@@ -16,7 +16,11 @@
     --hint:#7a7570;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;overscroll-behavior-y:contain;}
+
+  /* Back to top button */
+  #backToTop{position:fixed;bottom:70px;right:16px;z-index:200;width:40px;height:40px;border-radius:50%;background:var(--navy);color:#fff;border:none;font-size:20px;line-height:1;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25);display:none;align-items:center;justify-content:center;opacity:0.9;}
+  #backToTop:hover{background:var(--navy-deep);}
   h2{font-size:12.5px;text-transform:uppercase;letter-spacing:0.7px;color:var(--navy);font-weight:600;margin-bottom:14px;}
   .header{background:var(--navy);color:#fff;padding:12px 20px;display:flex;align-items:center;gap:14px;}
   .header svg{width:36px;height:36px;flex-shrink:0;}
@@ -784,11 +788,15 @@
     var dx = e.clientX - lastX, dy = e.clientY - lastY;
     lastX = e.clientX; lastY = e.clientY;
     var rect = canvas.getBoundingClientRect();
-    var scaleX = canvas.width / rect.width;
+    // displayScale: how many canvas pixels per screen pixel
+    var displayScale = canvas.width / rect.width;
     var p = state.photos[dragPhotoIdx];
     if (p) {
-      p.offsetX += dx * scaleX;
-      p.offsetY += dy * scaleX;
+      // Convert screen drag to canvas pixels, then scale by zoom so
+      // movement feels proportional to how much the photo is panned out
+      var zoom = p.zoom || 1;
+      p.offsetX += (dx / displayScale) * zoom;
+      p.offsetY += (dy / displayScale) * zoom;
       render();
     }
   });
@@ -1092,5 +1100,18 @@
 
 })();
 </script>
+
+  <button id="backToTop" title="Back to top">&#8679;</button>
+  <script>
+    (function(){
+      var btn = document.getElementById('backToTop');
+      window.addEventListener('scroll', function(){
+        btn.style.display = window.scrollY > 200 ? 'flex' : 'none';
+      }, {passive:true});
+      btn.addEventListener('click', function(){
+        window.scrollTo({top:0, behavior:'smooth'});
+      });
+    })();
+  </script>
 </body>
 </html>
