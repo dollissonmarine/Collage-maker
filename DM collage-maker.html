@@ -414,8 +414,8 @@
     var iw = photo.w, ih = photo.h;
     var scale = Math.max(w/iw, h/ih) * photo.zoom;
     var dw = iw * scale, dh = ih * scale;
-    var ox = x + (w - dw)/2 + photo.offsetX * scale;
-    var oy = y + (h - dh)/2 + photo.offsetY * scale;
+    var ox = x + (w - dw)/2 + photo.offsetX;
+    var oy = y + (h - dh)/2 + photo.offsetY;
     ctx.drawImage(photo.img, ox, oy, dw, dh);
     ctx.restore();
   }
@@ -788,15 +788,12 @@
     var dx = e.clientX - lastX, dy = e.clientY - lastY;
     lastX = e.clientX; lastY = e.clientY;
     var rect = canvas.getBoundingClientRect();
-    // displayScale: how many canvas pixels per screen pixel
+    // Convert screen pixels to canvas pixels
     var displayScale = canvas.width / rect.width;
     var p = state.photos[dragPhotoIdx];
     if (p) {
-      // Convert screen drag to canvas pixels, then scale by zoom so
-      // movement feels proportional to how much the photo is panned out
-      var zoom = p.zoom || 1;
-      p.offsetX += (dx / displayScale) * zoom;
-      p.offsetY += (dy / displayScale) * zoom;
+      p.offsetX += dx / displayScale;
+      p.offsetY += dy / displayScale;
       render();
     }
   });
